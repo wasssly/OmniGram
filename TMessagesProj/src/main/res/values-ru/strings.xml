@@ -2,6 +2,17 @@
 <resources>
     <string name="AppName">OmniGram</string>
     <string name="AppNameBeta">OmniGram Beta</string>
+    <string name="OmniGramSettingsTitle">Настройки OmniGram</string>
+    <string name="OmniGramSettingsSubtitle">Настройки клиента, экспериментальные функции и ссылки проекта</string>
+    <string name="OmniGramSettingsSection">OmniGram</string>
+    <string name="OmniGramSmoothAnimations">Плавные анимации</string>
+    <string name="OmniGramSmoothAnimationsInfo">Использовать стандартную настройку анимаций OmniGram.</string>
+    <string name="OmniGramExperimentalFeatures">Экспериментальные функции OmniGram</string>
+    <string name="OmniGramExperimentalFeaturesInfo">Включить новые функции OmniGram до их добавления в стабильную версию.</string>
+    <string name="OmniGramProjectSection">Проект</string>
+    <string name="OmniGramGitHub">OmniGram на GitHub</string>
+    <string name="OmniGramReleases">Релизы OmniGram</string>
+    <string name="OmniGramSettingsFooter">OmniGram — независимый клиент. Сервис обмена сообщениями работает на базе Telegram.</string>
     <string name="LanguageName">Русский</string>
     <string name="English">Английский</string>
     <string name="LanguageNameInEnglish">Russian</string>

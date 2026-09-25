@@ -115,9 +115,10 @@ jobs:
           apk=$(find TMessagesProj_App/build/outputs/apk -type f -name '*.apk' -print -quit)
           test -n "$apk"
           $ANDROID_HOME/build-tools/36.0.0/apksigner verify "$apk"
+          apk_name="OmniGram-${GITHUB_SHA::7}.apk"
           mkdir -p artifacts
-          cp "$apk" artifacts/OmniGram-release.apk
-          sha256sum artifacts/OmniGram-release.apk | tee artifacts/OmniGram-release.apk.sha256
+          cp "$apk" "artifacts/$apk_name"
+          sha256sum "artifacts/$apk_name" | tee "artifacts/$apk_name.sha256"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
