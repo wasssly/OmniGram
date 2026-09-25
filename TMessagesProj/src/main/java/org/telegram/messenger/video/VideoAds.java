@@ -182,6 +182,12 @@ public class VideoAds {
     private void load() {
         if (loading || loaded) return;
 
+        if (MessagesController.getGlobalMainSettings().getBoolean("omnigram_disable_ads", false)) {
+            loaded = true;
+            ads.clear();
+            return;
+        }
+
         if (UserConfig.getInstance(currentAccount).isPremium() && MessagesController.getInstance(currentAccount).isSponsoredDisabled()) {
             return;
         }

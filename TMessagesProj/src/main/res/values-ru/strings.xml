@@ -62,6 +62,8 @@
     <string name="OmniGramCleanTrackingInfo">Удаляет распространённые параметры аналитики, например utm_source, перед открытием ссылок.</string>
     <string name="OmniGramDisableProxyOnVpn">Отключать прокси при активном VPN</string>
     <string name="OmniGramDisableProxyOnVpnInfo">Временно отключает прокси Telegram, пока Android сообщает об активном VPN.</string>
+    <string name="OmniGramDisableAds">Скрывать рекламные сообщения и видеорекламу</string>
+    <string name="OmniGramDisableAdsInfo">Локально скрывает Sponsored Messages Telegram и рекламу в видео, не изменяя аккаунт или статус Premium.</string>
     <string name="OmniGramResetSettings">Сбросить настройки OmniGram</string>
     <string name="OmniGramResetSettingsInfo">Сбрасывает только настройки OmniGram. Аккаунты, чаты и настройки Telegram не изменяются.</string>
     <string name="OmniGramResetSettingsConfirm">Будут сброшены только настройки OmniGram. Аккаунты и чаты не будут затронуты.</string>

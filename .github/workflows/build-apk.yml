@@ -109,6 +109,8 @@ jobs:
 
       - name: Build signed release APK
         env:
+          CMAKE_BUILD_PARALLEL_LEVEL: 4
+          GRADLE_OPTS: -Dorg.gradle.workers.max=4
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
@@ -118,6 +120,8 @@ jobs:
           test -n "$RELEASE_KEY_PASSWORD" || { echo 'Missing RELEASE_KEY_PASSWORD.' >&2; exit 1; }
           bash ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace \
             --build-cache \
+            --max-workers=4 \
+            -POMNIGRAM_CI_ABIS=armeabi-v7a,arm64-v8a \
             -PRELEASE_STORE_PASSWORD="$RELEASE_STORE_PASSWORD" \
             -PRELEASE_KEY_ALIAS="$RELEASE_KEY_ALIAS" \
             -PRELEASE_KEY_PASSWORD="$RELEASE_KEY_PASSWORD"

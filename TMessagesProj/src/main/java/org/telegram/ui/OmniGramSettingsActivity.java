@@ -174,6 +174,7 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     addToggle(context, content, R.string.OmniGramSpoilerPhone, R.string.OmniGramSpoilerPhoneInfo, "omnigram_spoiler_phone", false, null);
                     addToggle(context, content, R.string.OmniGramCleanTracking, R.string.OmniGramCleanTrackingInfo, "omnigram_clean_tracking_params", true, null);
                     addToggle(context, content, R.string.OmniGramDisableProxyOnVpn, R.string.OmniGramDisableProxyOnVpnInfo, "omnigram_disable_proxy_on_vpn", false, null);
+                    addToggle(context, content, R.string.OmniGramDisableAds, R.string.OmniGramDisableAdsInfo, "omnigram_disable_ads", false, null);
                     addAction(context, content, R.string.OmniGramOpenPrivacySettings, R.string.OmniGramOpenPrivacySettingsInfo, v -> presentFragment(new PrivacySettingsActivity()));
                     break;
                 case CATEGORY_DATA:
@@ -210,6 +211,7 @@ public class OmniGramSettingsActivity extends BaseFragment {
                                 .remove("omnigram_spoiler_phone")
                                 .remove("omnigram_clean_tracking_params")
                                 .remove("omnigram_disable_proxy_on_vpn")
+                                .remove("omnigram_disable_ads")
                                 .apply();
                         SharedConfig.setAnimationsEnabled(true);
                         showSettingsToast(R.string.OmniGramSettingsReset);
@@ -229,6 +231,7 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 values.put("omnigram_spoiler_phone", preferences.getBoolean("omnigram_spoiler_phone", false));
                 values.put("omnigram_clean_tracking_params", preferences.getBoolean("omnigram_clean_tracking_params", true));
                 values.put("omnigram_disable_proxy_on_vpn", preferences.getBoolean("omnigram_disable_proxy_on_vpn", false));
+                values.put("omnigram_disable_ads", preferences.getBoolean("omnigram_disable_ads", false));
                 json.put("values", values);
                 exportPayload = json.toString(2);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -303,6 +306,7 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 if (pendingImportedValues.has("omnigram_spoiler_phone")) editor.putBoolean("omnigram_spoiler_phone", pendingImportedValues.getBoolean("omnigram_spoiler_phone"));
                 if (pendingImportedValues.has("omnigram_clean_tracking_params")) editor.putBoolean("omnigram_clean_tracking_params", pendingImportedValues.getBoolean("omnigram_clean_tracking_params"));
                 if (pendingImportedValues.has("omnigram_disable_proxy_on_vpn")) editor.putBoolean("omnigram_disable_proxy_on_vpn", pendingImportedValues.getBoolean("omnigram_disable_proxy_on_vpn"));
+                if (pendingImportedValues.has("omnigram_disable_ads")) editor.putBoolean("omnigram_disable_ads", pendingImportedValues.getBoolean("omnigram_disable_ads"));
                 editor.apply();
                 pendingImportedValues = null;
                 showSettingsToast(R.string.OmniGramSettingsImported);
