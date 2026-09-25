@@ -26,6 +26,13 @@ jobs:
           java-version: '21'
           cache: gradle
 
+      - name: Restore jlatexmath dependency
+        run: |
+          if [ ! -f TMessagesProj/lib/jlatexmath/jlatexmath/build.gradle ]; then
+            git clone --depth 1 https://github.com/dkaraush/jlatexmath-android.git TMessagesProj/lib/jlatexmath
+          fi
+          test -f TMessagesProj/lib/jlatexmath/jlatexmath/build.gradle
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
