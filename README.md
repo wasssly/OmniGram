@@ -1,7 +1,7 @@
-## Telegram messenger for Android
+## OmniGram for Android
 
-[Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
-This repo contains the official source code for [Telegram App for Android](https://play.google.com/store/apps/details?id=org.telegram.messenger).
+OmniGram is an independent Telegram client for Android focused on a clean, customizable experience.
+Source code: [github.com/wasssly/OmniGram](https://github.com/wasssly/OmniGram).
 
 ## Creating your Telegram Application
 
@@ -26,9 +26,9 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 You will require Android Studio 2025.1.4, Android NDK 27.2.12479018 and Android SDK 36.
 
-1. Clone the Telegram source code with its submodules:
+1. Clone OmniGram with its submodules:
    ```bash
-   git clone --recursive --shallow-submodules https://github.com/DrKLO/Telegram.git Telegram
+   git clone --recursive --shallow-submodules https://github.com/wasssly/OmniGram.git OmniGram
    ```
    In case you forgot the `--recursive` flag, change to the `Telegram` directory and run:
    ```bash
@@ -36,10 +36,27 @@ You will require Android Studio 2025.1.4, Android NDK 27.2.12479018 and Android 
    ```
 2. Copy your release.keystore into TMessagesProj/config
 3. Fill out RELEASE_KEY_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_STORE_PASSWORD in gradle.properties to access your  release.keystore
-4.  Go to https://console.firebase.google.com/, create two android apps with application IDs org.telegram.messenger and org.telegram.messenger.beta, turn on firebase messaging and download google-services.json, which should be copied to the same folder as TMessagesProj.
+4.  Go to https://console.firebase.google.com/, create an Android app with application ID `com.omnigram.app`, turn on Firebase Messaging and download `google-services.json` into `TMessagesProj_App/`.
 5. Open the project in the Studio (note that it should be opened, NOT imported).
 6. Fill out values in TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java – there’s a link for each of the variables showing where and which data to obtain.
-7. You are ready to compile Telegram.
+7. You are ready to compile OmniGram with `./gradlew :TMessagesProj_App:assembleAfatRelease`.
+
+### Automatic APK builds with GitHub Actions
+
+Every push to `main` runs [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml) and uploads the APK as a downloadable workflow artifact. For signed release APKs, add these repository secrets in **Settings → Secrets and variables → Actions**:
+
+- `RELEASE_KEYSTORE_BASE64` — base64 of `TMessagesProj/config/release.keystore`;
+- `RELEASE_STORE_PASSWORD` — keystore password;
+- `RELEASE_KEY_ALIAS` — key alias;
+- `RELEASE_KEY_PASSWORD` — key password.
+
+Create the base64 value locally with:
+
+```bash
+base64 -w 0 TMessagesProj/config/release.keystore
+```
+
+The workflow never commits the keystore. It recreates it only inside the temporary GitHub runner and removes it after the build.
 
 ### Localization
 
