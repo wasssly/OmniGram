@@ -54,6 +54,17 @@ jobs:
           fi
           test -f TMessagesProj/lib/jlatexmath/jlatexmath/build.gradle
 
+      - name: Restore Gradle and CMake caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            TMessagesProj/.cxx
+          key: ${{ runner.os }}-omnigram-build-${{ hashFiles('gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', 'TMessagesProj/jni/**') }}
+          restore-keys: |
+            ${{ runner.os }}-omnigram-build-
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -106,6 +117,7 @@ jobs:
           test -n "$RELEASE_KEY_ALIAS" || { echo 'Missing RELEASE_KEY_ALIAS.' >&2; exit 1; }
           test -n "$RELEASE_KEY_PASSWORD" || { echo 'Missing RELEASE_KEY_PASSWORD.' >&2; exit 1; }
           bash ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace \
+            --build-cache \
             -PRELEASE_STORE_PASSWORD="$RELEASE_STORE_PASSWORD" \
             -PRELEASE_KEY_ALIAS="$RELEASE_KEY_ALIAS" \
             -PRELEASE_KEY_PASSWORD="$RELEASE_KEY_PASSWORD"
