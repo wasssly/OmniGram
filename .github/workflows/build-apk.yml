@@ -26,6 +26,27 @@ jobs:
           java-version: '21'
           cache: gradle
 
+      - name: Restore native dependencies
+        run: |
+          restore_repo() {
+            local url="$1"
+            local path="$2"
+            if [ ! -d "$path" ] || [ -z "$(find "$path" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+              rm -rf "$path"
+              mkdir -p "$(dirname "$path")"
+              git clone --depth 1 "$url" "$path"
+            fi
+          }
+          restore_repo https://github.com/webmproject/libvpx.git TMessagesProj/jni/third_party/libvpx
+          restore_repo https://github.com/videolan/dav1d.git TMessagesProj/jni/third_party/dav1d
+          restore_repo https://github.com/FFmpeg/FFmpeg.git TMessagesProj/jni/third_party/ffmpeg
+          restore_repo https://github.com/xiph/ogg.git TMessagesProj/jni/third_party/xiph/ogg
+          restore_repo https://github.com/xiph/opus.git TMessagesProj/jni/third_party/xiph/opus
+          restore_repo https://github.com/xiph/opusfile.git TMessagesProj/jni/third_party/xiph/opusfile
+          restore_repo https://github.com/cisco/openh264.git TMessagesProj/jni/third_party/openh264
+          restore_repo https://chromium.googlesource.com/libyuv/libyuv TMessagesProj/jni/third_party/libyuv
+          restore_repo https://github.com/dkaraush/tlottie.git TMessagesProj/jni/tlottie
+
       - name: Restore jlatexmath dependency
         run: |
           if [ ! -f TMessagesProj/lib/jlatexmath/jlatexmath/build.gradle ]; then
