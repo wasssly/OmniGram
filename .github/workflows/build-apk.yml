@@ -65,7 +65,7 @@ jobs:
             exit 1
           }
           printf '%s%s%s%s' "$RELEASE_KEYSTORE_PART_1" "$RELEASE_KEYSTORE_PART_2" "$RELEASE_KEYSTORE_PART_3" "$RELEASE_KEYSTORE_PART_4" \
-            | base64 --decode > TMessagesProj/config/release.keystore
+            | python3 -c 'import sys; sys.stdout.buffer.write(bytes.fromhex(sys.stdin.read()))' > TMessagesProj/config/release.keystore
           chmod 600 TMessagesProj/config/release.keystore
 
       - name: Build signed release APK
