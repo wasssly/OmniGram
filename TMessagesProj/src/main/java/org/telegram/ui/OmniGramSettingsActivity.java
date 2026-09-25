@@ -170,12 +170,17 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     break;
                 case CATEGORY_PRIVACY:
                     addHeader(context, content, R.string.OmniGramPrivacySection);
+                    addToggle(context, content, R.string.OmniGramHidePhoneLocal, R.string.OmniGramHidePhoneLocalInfo, "omnigram_hide_phone_local", false, null);
+                    addToggle(context, content, R.string.OmniGramSpoilerPhone, R.string.OmniGramSpoilerPhoneInfo, "omnigram_spoiler_phone", false, null);
+                    addToggle(context, content, R.string.OmniGramCleanTracking, R.string.OmniGramCleanTrackingInfo, "omnigram_clean_tracking_params", true, null);
+                    addToggle(context, content, R.string.OmniGramDisableProxyOnVpn, R.string.OmniGramDisableProxyOnVpnInfo, "omnigram_disable_proxy_on_vpn", false, null);
                     addAction(context, content, R.string.OmniGramOpenPrivacySettings, R.string.OmniGramOpenPrivacySettingsInfo, v -> presentFragment(new PrivacySettingsActivity()));
                     break;
                 case CATEGORY_DATA:
                     addHeader(context, content, R.string.OmniGramDataSection);
                     addAction(context, content, R.string.OmniGramExportSettings, R.string.OmniGramExportSettingsInfo, v -> exportSettings());
                     addAction(context, content, R.string.OmniGramImportSettings, R.string.OmniGramImportSettingsInfo, v -> importSettings());
+                    addAction(context, content, R.string.OmniGramResetSettings, R.string.OmniGramResetSettingsInfo, v -> confirmResetSettings());
                     addAction(context, content, R.string.OmniGramOpenDataSettings, R.string.OmniGramOpenDataSettingsInfo, v -> presentFragment(new DataSettingsActivity()));
                     break;
                 case CATEGORY_PROJECT:
@@ -187,6 +192,29 @@ public class OmniGramSettingsActivity extends BaseFragment {
         }
 
         private String exportPayload;
+        private JSONObject pendingImportedValues;
+
+        private void confirmResetSettings() {
+            if (getParentActivity() == null) return;
+            new AlertDialog.Builder(getParentActivity())
+                    .setTitle(LocaleController.getString(R.string.OmniGramResetSettings))
+                    .setMessage(LocaleController.getString(R.string.OmniGramResetSettingsConfirm))
+                    .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                    .setPositiveButton(LocaleController.getString(R.string.Reset), (dialog, which) -> {
+                        preferences.edit()
+                                .remove("view_animations")
+                                .remove("omnigram_experimental_features")
+                                .remove("autoplay_video")
+                                .remove("autoplay_gif")
+                                .remove("omnigram_hide_phone_local")
+                                .remove("omnigram_spoiler_phone")
+                                .remove("omnigram_clean_tracking_params")
+                                .remove("omnigram_disable_proxy_on_vpn")
+                                .apply();
+                        SharedConfig.setAnimationsEnabled(true);
+                        showSettingsToast(R.string.OmniGramSettingsReset);
+                    }).show();
+        }
 
         private void exportSettings() {
             try {
@@ -197,6 +225,10 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 values.put("omnigram_experimental_features", preferences.getBoolean("omnigram_experimental_features", false));
                 values.put("autoplay_video", preferences.getBoolean("autoplay_video", true));
                 values.put("autoplay_gif", preferences.getBoolean("autoplay_gif", true));
+                values.put("omnigram_hide_phone_local", preferences.getBoolean("omnigram_hide_phone_local", false));
+                values.put("omnigram_spoiler_phone", preferences.getBoolean("omnigram_spoiler_phone", false));
+                values.put("omnigram_clean_tracking_params", preferences.getBoolean("omnigram_clean_tracking_params", true));
+                values.put("omnigram_disable_proxy_on_vpn", preferences.getBoolean("omnigram_disable_proxy_on_vpn", false));
                 json.put("values", values);
                 exportPayload = json.toString(2);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -235,18 +267,16 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     scanner.close();
                     JSONObject root = new JSONObject(raw);
                     if (root.optInt("schemaVersion", -1) != 1) throw new IllegalArgumentException("Unsupported schema");
-                    JSONObject values = root.getJSONObject("values");
-                    SharedPreferences.Editor editor = preferences.edit();
-                    if (values.has("view_animations")) {
-                        boolean enabled = values.getBoolean("view_animations");
-                        editor.putBoolean("view_animations", enabled);
-                        SharedConfig.setAnimationsEnabled(enabled);
-                    }
-                    if (values.has("omnigram_experimental_features")) editor.putBoolean("omnigram_experimental_features", values.getBoolean("omnigram_experimental_features"));
-                    if (values.has("autoplay_video")) editor.putBoolean("autoplay_video", values.getBoolean("autoplay_video"));
-                    if (values.has("autoplay_gif")) editor.putBoolean("autoplay_gif", values.getBoolean("autoplay_gif"));
-                    editor.apply();
-                    showSettingsToast(R.string.OmniGramSettingsImported);
+                    pendingImportedValues = root.getJSONObject("values");
+                    StringBuilder preview = new StringBuilder(LocaleController.getString(R.string.OmniGramImportPreview));
+                    java.util.Iterator<String> keys = pendingImportedValues.keys();
+                    while (keys.hasNext()) preview.append("\n• ").append(keys.next());
+                    new AlertDialog.Builder(getParentActivity())
+                            .setTitle(LocaleController.getString(R.string.OmniGramImportSettings))
+                            .setMessage(preview.toString())
+                            .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                            .setPositiveButton(LocaleController.getString(R.string.OK), (dialog, which) -> applyImportedSettings())
+                            .show();
                 }
             } catch (Exception e) {
                 showSettingsToast(R.string.OmniGramSettingsOperationFailed);
@@ -255,6 +285,30 @@ public class OmniGramSettingsActivity extends BaseFragment {
 
         private void showSettingsToast(int message) {
             if (getParentActivity() != null) Toast.makeText(getParentActivity(), LocaleController.getString(message), Toast.LENGTH_SHORT).show();
+        }
+
+        private void applyImportedSettings() {
+            if (pendingImportedValues == null) return;
+            try {
+                SharedPreferences.Editor editor = preferences.edit();
+                if (pendingImportedValues.has("view_animations")) {
+                    boolean enabled = pendingImportedValues.getBoolean("view_animations");
+                    editor.putBoolean("view_animations", enabled);
+                    SharedConfig.setAnimationsEnabled(enabled);
+                }
+                if (pendingImportedValues.has("omnigram_experimental_features")) editor.putBoolean("omnigram_experimental_features", pendingImportedValues.getBoolean("omnigram_experimental_features"));
+                if (pendingImportedValues.has("autoplay_video")) editor.putBoolean("autoplay_video", pendingImportedValues.getBoolean("autoplay_video"));
+                if (pendingImportedValues.has("autoplay_gif")) editor.putBoolean("autoplay_gif", pendingImportedValues.getBoolean("autoplay_gif"));
+                if (pendingImportedValues.has("omnigram_hide_phone_local")) editor.putBoolean("omnigram_hide_phone_local", pendingImportedValues.getBoolean("omnigram_hide_phone_local"));
+                if (pendingImportedValues.has("omnigram_spoiler_phone")) editor.putBoolean("omnigram_spoiler_phone", pendingImportedValues.getBoolean("omnigram_spoiler_phone"));
+                if (pendingImportedValues.has("omnigram_clean_tracking_params")) editor.putBoolean("omnigram_clean_tracking_params", pendingImportedValues.getBoolean("omnigram_clean_tracking_params"));
+                if (pendingImportedValues.has("omnigram_disable_proxy_on_vpn")) editor.putBoolean("omnigram_disable_proxy_on_vpn", pendingImportedValues.getBoolean("omnigram_disable_proxy_on_vpn"));
+                editor.apply();
+                pendingImportedValues = null;
+                showSettingsToast(R.string.OmniGramSettingsImported);
+            } catch (Exception e) {
+                showSettingsToast(R.string.OmniGramSettingsOperationFailed);
+            }
         }
 
         private void addHeader(Context context, LinearLayout content, int title) {

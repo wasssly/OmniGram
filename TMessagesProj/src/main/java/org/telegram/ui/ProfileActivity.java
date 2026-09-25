@@ -13584,7 +13584,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == numberRow) {
                         TLRPC.User user = UserConfig.getInstance(currentAccount).getCurrentUser();
                         String value;
-                        if (user != null && user.phone != null && user.phone.length() != 0) {
+                        boolean hidePhoneLocally = MessagesController.getGlobalMainSettings().getBoolean("omnigram_hide_phone_local", false);
+                        boolean spoilerPhone = MessagesController.getGlobalMainSettings().getBoolean("omnigram_spoiler_phone", false);
+                        if (hidePhoneLocally || spoilerPhone) {
+                            value = "••••••";
+                        } else if (user != null && user.phone != null && user.phone.length() != 0) {
                             value = PhoneFormat.getInstance().format("+" + user.phone);
                         } else {
                             value = LocaleController.getString(R.string.NumberUnknown);
@@ -16322,7 +16326,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (textToCopy != null) textToCopy = "@" + textToCopy;
             copyButton = getString(R.string.ProfileCopyUsername);
         } else if (position == phoneRow) {
-            textToCopy = user.phone;
+            if (!MessagesController.getGlobalMainSettings().getBoolean("omnigram_hide_phone_local", false)
+                    && !MessagesController.getGlobalMainSettings().getBoolean("omnigram_spoiler_phone", false)) {
+                textToCopy = user.phone;
+            }
         } else if (position == birthdayRow) {
             textToCopy = UserInfoActivity.birthdayString(userInfo.birthday);
         }

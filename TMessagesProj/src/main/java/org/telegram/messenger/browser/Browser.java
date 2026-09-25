@@ -292,6 +292,9 @@ public class Browser {
         if (context == null || uri == null) {
             return;
         }
+        if (MessagesController.getGlobalMainSettings().getBoolean("omnigram_clean_tracking_params", true)) {
+            uri = removeTrackingParameters(uri);
+        }
         final int currentAccount = UserConfig.selectedAccount;
         boolean[] forceBrowser = new boolean[]{false};
         boolean internalUri = isInternalUri(uri, forceBrowser);
@@ -440,6 +443,32 @@ public class Browser {
         } catch (Exception e) {
             FileLog.e(e);
         }
+    }
+
+    private static Uri removeTrackingParameters(Uri uri) {
+        if (uri == null || uri.getQuery() == null) return uri;
+        Uri.Builder builder = uri.buildUpon().clearQuery();
+        boolean changed = false;
+        for (String name : uri.getQueryParameterNames()) {
+            String lowerName = name.toLowerCase(java.util.Locale.US);
+            boolean tracking = lowerName.startsWith("utm_")
+                    || lowerName.equals("gclid")
+                    || lowerName.equals("dclid")
+                    || lowerName.equals("fbclid")
+                    || lowerName.equals("msclkid")
+                    || lowerName.equals("mc_cid")
+                    || lowerName.equals("mc_eid")
+                    || lowerName.equals("yclid")
+                    || lowerName.equals("_ga");
+            if (tracking) {
+                changed = true;
+                continue;
+            }
+            for (String value : uri.getQueryParameters(name)) {
+                builder.appendQueryParameter(name, value);
+            }
+        }
+        return changed ? builder.build() : uri;
     }
 
     public static boolean openAsInternalIntent(Context context, String url) {

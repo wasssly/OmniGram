@@ -436,6 +436,13 @@ public class ApplicationLoader extends Application {
                             @Override
                             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
                                 lastKnownNetworkType = -1;
+                                updateOmniGramProxyForVpn(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN));
+                            }
+
+                            @Override
+                            public void onLost(@NonNull Network network) {
+                                lastKnownNetworkType = -1;
+                                updateOmniGramProxyForVpn(false);
                             }
                         };
                         connectivityManager.registerDefaultNetworkCallback(networkCallback);
@@ -444,6 +451,20 @@ public class ApplicationLoader extends Application {
             } catch (Throwable ignore) {
 
             }
+        }
+    }
+
+    private static void updateOmniGramProxyForVpn(boolean vpnActive) {
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        if (!preferences.getBoolean("omnigram_disable_proxy_on_vpn", false)) return;
+        boolean temporarilyDisabled = preferences.getBoolean("omnigram_proxy_temporarily_disabled", false);
+        boolean proxyEnabled = preferences.getBoolean("proxy_enabled", false);
+        if (vpnActive && proxyEnabled && !temporarilyDisabled && SharedConfig.currentProxy != null) {
+            preferences.edit().putBoolean("omnigram_proxy_temporarily_disabled", true).apply();
+            ConnectionsManager.setProxySettings(false, "", 0, "", "", "");
+        } else if (!vpnActive && temporarilyDisabled && SharedConfig.currentProxy != null) {
+            preferences.edit().putBoolean("omnigram_proxy_temporarily_disabled", false).apply();
+            ConnectionsManager.setProxySettings(true, SharedConfig.currentProxy.address, SharedConfig.currentProxy.port, SharedConfig.currentProxy.username, SharedConfig.currentProxy.password, SharedConfig.currentProxy.secret);
         }
     }
 
