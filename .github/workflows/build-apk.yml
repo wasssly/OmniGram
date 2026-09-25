@@ -54,13 +54,18 @@ jobs:
 
       - name: Restore release keystore
         env:
-          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PART_1: ${{ secrets.RELEASE_KEYSTORE_PART_1 }}
+          RELEASE_KEYSTORE_PART_2: ${{ secrets.RELEASE_KEYSTORE_PART_2 }}
+          RELEASE_KEYSTORE_PART_3: ${{ secrets.RELEASE_KEYSTORE_PART_3 }}
+          RELEASE_KEYSTORE_PART_4: ${{ secrets.RELEASE_KEYSTORE_PART_4 }}
         run: |
-          test -n "$RELEASE_KEYSTORE_BASE64" || {
-            echo 'Missing RELEASE_KEYSTORE_BASE64 repository secret.' >&2
+          test -n "$RELEASE_KEYSTORE_PART_1" && test -n "$RELEASE_KEYSTORE_PART_2" && \
+            test -n "$RELEASE_KEYSTORE_PART_3" && test -n "$RELEASE_KEYSTORE_PART_4" || {
+            echo 'Missing one or more RELEASE_KEYSTORE_PART_* repository secrets.' >&2
             exit 1
           }
-          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > TMessagesProj/config/release.keystore
+          printf '%s%s%s%s' "$RELEASE_KEYSTORE_PART_1" "$RELEASE_KEYSTORE_PART_2" "$RELEASE_KEYSTORE_PART_3" "$RELEASE_KEYSTORE_PART_4" \
+            | base64 --decode > TMessagesProj/config/release.keystore
           chmod 600 TMessagesProj/config/release.keystore
 
       - name: Build signed release APK
