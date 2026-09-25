@@ -30,7 +30,7 @@ public class BuildVars {
     public static String APP_HASH = "17f0ba1b64bd8726cd6c2b6eee0fdf21";
 
     // SafetyNet key for Google Identity SDK, set it to empty to disable
-    public static String SAFETYNET_KEY = "REDACTED_BY_HISTORY_CLEANUP";
+    public static String SAFETYNET_KEY = "";
     public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=com.omnigram.app";
     public static String HUAWEI_STORE_URL = "https://appgallery.huawei.com/app/C101184875";
     public static String GOOGLE_AUTH_CLIENT_ID = "760348033671-81kmi3pi84p11ub8hp9a1funsv0rn2p9.apps.googleusercontent.com";

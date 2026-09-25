@@ -22,7 +22,7 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ### Compilation Guide
 
-**Note**: In order to support [reproducible builds](https://core.telegram.org/reproducible-builds), this repo contains dummy release.keystore,  google-services.json and filled variables inside BuildVars.java. Before publishing your own APKs please make sure to replace all these files with your own.
+**Security note**: release keystores and Firebase configuration are not stored in this repository. Keep them locally or provide them to CI through GitHub Actions Secrets.
 
 You will require Android Studio 2025.1.4, Android NDK 27.2.12479018 and Android SDK 36.
 
@@ -30,33 +30,40 @@ You will require Android Studio 2025.1.4, Android NDK 27.2.12479018 and Android 
    ```bash
    git clone --recursive --shallow-submodules https://github.com/wasssly/OmniGram.git OmniGram
    ```
-   In case you forgot the `--recursive` flag, change to the `Telegram` directory and run:
+   In case you forgot the `--recursive` flag, change to the `OmniGram` directory and run:
    ```bash
    git submodule init && git submodule update --init --recursive --depth=1
    ```
 2. Copy your release.keystore into TMessagesProj/config
 3. Fill out RELEASE_KEY_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_STORE_PASSWORD in gradle.properties to access your  release.keystore
-4.  Go to https://console.firebase.google.com/, create an Android app with application ID `com.omnigram.app`, turn on Firebase Messaging and download `google-services.json` into `TMessagesProj_App/`.
+4.  Go to https://console.firebase.google.com/, create an Android app with application ID `com.omnigram.app`, turn on Firebase Messaging and download `google-services.json` into `TMessagesProj_App/`. This file is ignored by Git.
 5. Open the project in the Studio (note that it should be opened, NOT imported).
 6. Fill out values in TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java – there’s a link for each of the variables showing where and which data to obtain.
-7. You are ready to compile OmniGram with `./gradlew :TMessagesProj_App:assembleAfatRelease`.
+7. You are ready to compile OmniGram with `bash ./gradlew :TMessagesProj_App:assembleAfatRelease`.
 
 ### Automatic APK builds with GitHub Actions
 
-Every push to `main` runs [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml) and uploads the APK as a downloadable workflow artifact. For signed release APKs, add these repository secrets in **Settings → Secrets and variables → Actions**:
+Every push to `main` runs [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml) and uploads the APK as a downloadable workflow artifact. Add these repository secrets in **Settings → Secrets and variables → Actions**:
 
+- `GOOGLE_SERVICES_JSON_BASE64` — base64 of `TMessagesProj_App/google-services.json`;
 - `RELEASE_KEYSTORE_BASE64` — base64 of `TMessagesProj/config/release.keystore`;
 - `RELEASE_STORE_PASSWORD` — keystore password;
 - `RELEASE_KEY_ALIAS` — key alias;
 - `RELEASE_KEY_PASSWORD` — key password.
 
-Create the base64 value locally with:
+Create the Firebase secret locally with:
+
+```bash
+base64 -w 0 TMessagesProj_App/google-services.json
+```
+
+Create the keystore secret locally with:
 
 ```bash
 base64 -w 0 TMessagesProj/config/release.keystore
 ```
 
-The workflow never commits the keystore. It recreates it only inside the temporary GitHub runner and removes it after the build.
+The workflow never commits Firebase configuration or the keystore. It recreates both only inside the temporary GitHub runner and removes them after the build.
 
 ### Localization
 
