@@ -121,7 +121,7 @@ jobs:
           bash ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace \
             --build-cache \
             --max-workers=4 \
-            -POMNIGRAM_CI_ABIS=armeabi-v7a,arm64-v8a \
+            -POMNIGRAM_CI_ABIS=arm64-v8a \
             -PRELEASE_STORE_PASSWORD="$RELEASE_STORE_PASSWORD" \
             -PRELEASE_KEY_ALIAS="$RELEASE_KEY_ALIAS" \
             -PRELEASE_KEY_PASSWORD="$RELEASE_KEY_PASSWORD"

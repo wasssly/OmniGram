@@ -156,17 +156,24 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     break;
                 case CATEGORY_APPEARANCE:
                     addHeader(context, content, R.string.OmniGramAppearanceSection);
-                    addAction(context, content, R.string.OmniGramOpenThemes, R.string.OmniGramOpenThemesInfo, v -> presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC)));
-                    addAction(context, content, R.string.OmniGramOpenNightThemes, R.string.OmniGramOpenNightThemesInfo, v -> presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_NIGHT)));
+                    addToggle(context, content, R.string.OmniGramMaterial3, R.string.OmniGramMaterial3Info, "omnigram_material3", true, null);
+                    addToggle(context, content, R.string.OmniGramFloatingTabs, R.string.OmniGramFloatingTabsInfo, "omnigram_floating_tabs", false, null);
+                    addChoice(context, content, R.string.OmniGramCornerRadius, "omnigram_corner_radius", new String[] {"Малые", "Средние", "Большие"}, new String[] {"small", "medium", "large"}, "medium");
+                    addChoice(context, content, R.string.OmniGramNavigationStyle, "omnigram_navigation_style", new String[] {"Классическая", "Плавающая", "Минималистичная"}, new String[] {"classic", "floating", "minimal"}, "classic");
                     break;
                 case CATEGORY_CHATS:
                     addHeader(context, content, R.string.OmniGramChatsSection);
-                    addToggle(context, content, R.string.OmniGramAutoplayVideo, R.string.OmniGramAutoplayVideoInfo, "autoplay_video", true, null);
-                    addToggle(context, content, R.string.OmniGramAutoplayGif, R.string.OmniGramAutoplayGifInfo, "autoplay_gif", true, null);
+                    addChoice(context, content, R.string.OmniGramInputStyle, "omnigram_input_style", new String[] {"Стандартная", "Компактная", "Плавающая"}, new String[] {"standard", "compact", "floating"}, "standard");
+                    addToggle(context, content, R.string.OmniGramReorderMessageActions, R.string.OmniGramReorderMessageActionsInfo, "omnigram_reorder_message_actions", false, null);
+                    addToggle(context, content, R.string.OmniGramHideMessageActions, R.string.OmniGramHideMessageActionsInfo, "omnigram_hide_message_actions", false, null);
+                    addToggle(context, content, R.string.OmniGramScrollToTopButton, R.string.OmniGramScrollToTopButtonInfo, "omnigram_scroll_to_top", true, null);
                     break;
                 case CATEGORY_MEDIA:
                     addHeader(context, content, R.string.OmniGramMediaSection);
-                    addAction(context, content, R.string.OmniGramOpenMediaSettings, R.string.OmniGramOpenMediaSettingsInfo, v -> presentFragment(new DataSettingsActivity()));
+                    addChoice(context, content, R.string.OmniGramSliderStyle, "omnigram_slider_style", new String[] {"Классический", "Тонкий", "Акцентный"}, new String[] {"classic", "thin", "accent"}, "classic");
+                    addChoice(context, content, R.string.OmniGramLoadingIndicator, "omnigram_loading_indicator", new String[] {"Круговой", "Линейный", "Минималистичный"}, new String[] {"circular", "linear", "minimal"}, "circular");
+                    addToggle(context, content, R.string.OmniGramAutoplayVideo, R.string.OmniGramAutoplayVideoInfo, "omnigram_autoplay_video", true, null);
+                    addToggle(context, content, R.string.OmniGramAutoplayGif, R.string.OmniGramAutoplayGifInfo, "omnigram_autoplay_gif", true, null);
                     break;
                 case CATEGORY_PRIVACY:
                     addHeader(context, content, R.string.OmniGramPrivacySection);
@@ -175,14 +182,12 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     addToggle(context, content, R.string.OmniGramCleanTracking, R.string.OmniGramCleanTrackingInfo, "omnigram_clean_tracking_params", true, null);
                     addToggle(context, content, R.string.OmniGramDisableProxyOnVpn, R.string.OmniGramDisableProxyOnVpnInfo, "omnigram_disable_proxy_on_vpn", false, null);
                     addToggle(context, content, R.string.OmniGramDisableAds, R.string.OmniGramDisableAdsInfo, "omnigram_disable_ads", false, null);
-                    addAction(context, content, R.string.OmniGramOpenPrivacySettings, R.string.OmniGramOpenPrivacySettingsInfo, v -> presentFragment(new PrivacySettingsActivity()));
                     break;
                 case CATEGORY_DATA:
                     addHeader(context, content, R.string.OmniGramDataSection);
                     addAction(context, content, R.string.OmniGramExportSettings, R.string.OmniGramExportSettingsInfo, v -> exportSettings());
                     addAction(context, content, R.string.OmniGramImportSettings, R.string.OmniGramImportSettingsInfo, v -> importSettings());
                     addAction(context, content, R.string.OmniGramResetSettings, R.string.OmniGramResetSettingsInfo, v -> confirmResetSettings());
-                    addAction(context, content, R.string.OmniGramOpenDataSettings, R.string.OmniGramOpenDataSettingsInfo, v -> presentFragment(new DataSettingsActivity()));
                     break;
                 case CATEGORY_PROJECT:
                     addHeader(context, content, R.string.OmniGramProjectSection);
@@ -212,6 +217,18 @@ public class OmniGramSettingsActivity extends BaseFragment {
                                 .remove("omnigram_clean_tracking_params")
                                 .remove("omnigram_disable_proxy_on_vpn")
                                 .remove("omnigram_disable_ads")
+                                .remove("omnigram_material3")
+                                .remove("omnigram_floating_tabs")
+                                .remove("omnigram_corner_radius")
+                                .remove("omnigram_navigation_style")
+                                .remove("omnigram_input_style")
+                                .remove("omnigram_reorder_message_actions")
+                                .remove("omnigram_hide_message_actions")
+                                .remove("omnigram_scroll_to_top")
+                                .remove("omnigram_slider_style")
+                                .remove("omnigram_loading_indicator")
+                                .remove("omnigram_autoplay_video")
+                                .remove("omnigram_autoplay_gif")
                                 .apply();
                         SharedConfig.setAnimationsEnabled(true);
                         showSettingsToast(R.string.OmniGramSettingsReset);
@@ -232,6 +249,18 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 values.put("omnigram_clean_tracking_params", preferences.getBoolean("omnigram_clean_tracking_params", true));
                 values.put("omnigram_disable_proxy_on_vpn", preferences.getBoolean("omnigram_disable_proxy_on_vpn", false));
                 values.put("omnigram_disable_ads", preferences.getBoolean("omnigram_disable_ads", false));
+                values.put("omnigram_material3", preferences.getBoolean("omnigram_material3", true));
+                values.put("omnigram_floating_tabs", preferences.getBoolean("omnigram_floating_tabs", false));
+                values.put("omnigram_corner_radius", preferences.getString("omnigram_corner_radius", "medium"));
+                values.put("omnigram_navigation_style", preferences.getString("omnigram_navigation_style", "classic"));
+                values.put("omnigram_input_style", preferences.getString("omnigram_input_style", "standard"));
+                values.put("omnigram_reorder_message_actions", preferences.getBoolean("omnigram_reorder_message_actions", false));
+                values.put("omnigram_hide_message_actions", preferences.getBoolean("omnigram_hide_message_actions", false));
+                values.put("omnigram_scroll_to_top", preferences.getBoolean("omnigram_scroll_to_top", true));
+                values.put("omnigram_slider_style", preferences.getString("omnigram_slider_style", "classic"));
+                values.put("omnigram_loading_indicator", preferences.getString("omnigram_loading_indicator", "circular"));
+                values.put("omnigram_autoplay_video", preferences.getBoolean("omnigram_autoplay_video", true));
+                values.put("omnigram_autoplay_gif", preferences.getBoolean("omnigram_autoplay_gif", true));
                 json.put("values", values);
                 exportPayload = json.toString(2);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -307,6 +336,18 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 if (pendingImportedValues.has("omnigram_clean_tracking_params")) editor.putBoolean("omnigram_clean_tracking_params", pendingImportedValues.getBoolean("omnigram_clean_tracking_params"));
                 if (pendingImportedValues.has("omnigram_disable_proxy_on_vpn")) editor.putBoolean("omnigram_disable_proxy_on_vpn", pendingImportedValues.getBoolean("omnigram_disable_proxy_on_vpn"));
                 if (pendingImportedValues.has("omnigram_disable_ads")) editor.putBoolean("omnigram_disable_ads", pendingImportedValues.getBoolean("omnigram_disable_ads"));
+                if (pendingImportedValues.has("omnigram_material3")) editor.putBoolean("omnigram_material3", pendingImportedValues.getBoolean("omnigram_material3"));
+                if (pendingImportedValues.has("omnigram_floating_tabs")) editor.putBoolean("omnigram_floating_tabs", pendingImportedValues.getBoolean("omnigram_floating_tabs"));
+                if (pendingImportedValues.has("omnigram_corner_radius")) editor.putString("omnigram_corner_radius", pendingImportedValues.getString("omnigram_corner_radius"));
+                if (pendingImportedValues.has("omnigram_navigation_style")) editor.putString("omnigram_navigation_style", pendingImportedValues.getString("omnigram_navigation_style"));
+                if (pendingImportedValues.has("omnigram_input_style")) editor.putString("omnigram_input_style", pendingImportedValues.getString("omnigram_input_style"));
+                if (pendingImportedValues.has("omnigram_reorder_message_actions")) editor.putBoolean("omnigram_reorder_message_actions", pendingImportedValues.getBoolean("omnigram_reorder_message_actions"));
+                if (pendingImportedValues.has("omnigram_hide_message_actions")) editor.putBoolean("omnigram_hide_message_actions", pendingImportedValues.getBoolean("omnigram_hide_message_actions"));
+                if (pendingImportedValues.has("omnigram_scroll_to_top")) editor.putBoolean("omnigram_scroll_to_top", pendingImportedValues.getBoolean("omnigram_scroll_to_top"));
+                if (pendingImportedValues.has("omnigram_slider_style")) editor.putString("omnigram_slider_style", pendingImportedValues.getString("omnigram_slider_style"));
+                if (pendingImportedValues.has("omnigram_loading_indicator")) editor.putString("omnigram_loading_indicator", pendingImportedValues.getString("omnigram_loading_indicator"));
+                if (pendingImportedValues.has("omnigram_autoplay_video")) editor.putBoolean("omnigram_autoplay_video", pendingImportedValues.getBoolean("omnigram_autoplay_video"));
+                if (pendingImportedValues.has("omnigram_autoplay_gif")) editor.putBoolean("omnigram_autoplay_gif", pendingImportedValues.getBoolean("omnigram_autoplay_gif"));
                 editor.apply();
                 pendingImportedValues = null;
                 showSettingsToast(R.string.OmniGramSettingsImported);
@@ -337,6 +378,27 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 infoCell.setText(LocaleController.getString(info));
                 content.addView(infoCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
             }
+        }
+
+        private void addChoice(Context context, LinearLayout content, int title, String key, String[] labels, String[] values, String defaultValue) {
+            TextCell cell = new TextCell(context, 23, false, true, null);
+            cell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+            String selected = preferences.getString(key, defaultValue);
+            cell.setTextAndValue(LocaleController.getString(title), getChoiceLabel(selected, values, labels), true);
+            cell.setOnClickListener(v -> new AlertDialog.Builder(getParentActivity())
+                    .setTitle(LocaleController.getString(title))
+                    .setItems(labels, (dialog, which) -> {
+                        preferences.edit().putString(key, values[which]).apply();
+                        cell.setTextAndValue(LocaleController.getString(title), labels[which], true);
+                    }).show());
+            content.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(50)));
+        }
+
+        private String getChoiceLabel(String selected, String[] values, String[] labels) {
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(selected)) return labels[i];
+            }
+            return labels[0];
         }
 
         private void addAction(Context context, LinearLayout content, int title, Integer info, View.OnClickListener listener) {
