@@ -66,6 +66,16 @@
     <string name="OmniGramDisableAdsInfo">Локально скрывает Sponsored Messages Telegram и рекламу в видео, не изменяя аккаунт или статус Premium.</string>
     <string name="OmniGramOtherSection">Другое</string>
     <string name="OmniGramMoreSection">OmniGram</string>
+    <string name="OmniGramMaterial3">Material Design 3 для OmniGram</string>
+    <string name="OmniGramMaterial3Info">Применяет карточки, отступы и формы Material 3 к интерфейсу OmniGram.</string>
+    <string name="OmniGramCornerRadius">Скругление пузырей сообщений</string>
+    <string name="OmniGramFloatingTabs">Плавающая панель вкладок</string>
+    <string name="OmniGramFloatingTabsInfo">Показывает папки чатов отдельной округлой панелью с отступами.</string>
+    <string name="OmniGramInputStyle">Стиль панели ввода</string>
+    <string name="OmniGramReorderMessageActions">Порядок действий меню сообщения</string>
+    <string name="OmniGramReorderMessageActionsInfo">Ставит «Ответить», «Копировать» и «Переслать» в начало меню.</string>
+    <string name="OmniGramHideMessageActions">Скрывать дополнительные действия</string>
+    <string name="OmniGramHideMessageActionsInfo">Скрывает перевод, жалобу, статистику и другие редко используемые пункты.</string>
     <string name="OmniGramResetSettings">Сбросить настройки OmniGram</string>
     <string name="OmniGramResetSettingsInfo">Сбрасывает только настройки OmniGram. Аккаунты, чаты и настройки Telegram не изменяются.</string>
     <string name="OmniGramResetSettingsConfirm">Будут сброшены только настройки OmniGram. Аккаунты и чаты не будут затронуты.</string>

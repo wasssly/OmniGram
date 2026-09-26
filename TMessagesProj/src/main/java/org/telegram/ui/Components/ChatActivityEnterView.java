@@ -5787,6 +5787,14 @@ public class ChatActivityEnterView extends FrameLayout implements
         messageEditText.setHintTextColor(getThemedColor(Theme.key_chat_messagePanelHint));
         messageEditText.setCursorColor(getThemedColor(Theme.key_chat_messagePanelCursor));
         messageEditText.setHandlesColor(getThemedColor(Theme.key_chat_TextSelectionCursor));
+        String omnigramInputStyle = MessagesController.getGlobalMainSettings().getString("omnigram_input_style", "standard");
+        if ("compact".equals(omnigramInputStyle)) {
+            messageEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+            messageEditText.setPadding(0, dp(5), 0, dp(6));
+        } else if ("floating".equals(omnigramInputStyle)) {
+            messageEditText.setBackground(Theme.createRoundRectDrawable(dp(18), getThemedColor(Theme.key_chat_messagePanelBackground)));
+            messageEditText.setPadding(dp(12), dp(7), dp(12), dp(8));
+        }
         messageEditTextContainer.addView(messageEditText, 1, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 52, 0, isChat ? 50 : 2, 1.5f));
 
         richDraftPreview = new RichMessageLayout.PreviewView(getContext(), currentAccount, resourcesProvider);

@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -62,6 +63,10 @@ public class OmniGramSettingsActivity extends BaseFragment {
         });
 
         LinearLayout content = createContent(context);
+        addSection(context, content, R.string.OmniGramAppearanceSection,
+                new int[] {R.string.OmniGramCategoryAppearance, R.string.OmniGramCategoryChats, R.string.OmniGramCategoryMedia},
+                new int[] {R.drawable.settings_features, R.drawable.settings_chat, R.drawable.settings_data},
+                new int[] {CATEGORY_APPEARANCE, CATEGORY_CHATS, CATEGORY_MEDIA});
         addSection(context, content, R.string.OmniGramGeneralSection,
                 new int[] {R.string.OmniGramCategoryGeneral},
                 new int[] {R.drawable.settings_power},
@@ -86,7 +91,9 @@ public class OmniGramSettingsActivity extends BaseFragment {
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        content.setPadding(AndroidUtilities.dp(12), AndroidUtilities.dp(12), AndroidUtilities.dp(12), AndroidUtilities.dp(16));
+        boolean material3 = MessagesController.getGlobalMainSettings().getBoolean("omnigram_material3", true);
+        int inset = material3 ? 12 : 0;
+        content.setPadding(AndroidUtilities.dp(inset), AndroidUtilities.dp(inset), AndroidUtilities.dp(inset), AndroidUtilities.dp(16));
         return content;
     }
 
@@ -100,7 +107,8 @@ public class OmniGramSettingsActivity extends BaseFragment {
     private void addSection(Context context, LinearLayout content, int sectionTitle, int[] titles, int[] icons, int[] categories) {
         LinearLayout card = new LinearLayout(context);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackground(createRoundedBackground(context));
+        boolean material3 = MessagesController.getGlobalMainSettings().getBoolean("omnigram_material3", true);
+        card.setBackground(createRoundedBackground(context, material3 ? 20 : 4));
         TextView section = new TextView(context);
         section.setText(LocaleController.getString(sectionTitle));
         section.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
@@ -117,10 +125,10 @@ public class OmniGramSettingsActivity extends BaseFragment {
         content.addView(card, cardParams);
     }
 
-    private GradientDrawable createRoundedBackground(Context context) {
+    private GradientDrawable createRoundedBackground(Context context, int radius) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-        drawable.setCornerRadius(AndroidUtilities.dp(20));
+        drawable.setCornerRadius(AndroidUtilities.dp(radius));
         return drawable;
     }
 
@@ -183,6 +191,26 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     addHeader(context, content, R.string.OmniGramGeneralSection);
                     addToggle(context, content, R.string.OmniGramSmoothAnimations, R.string.OmniGramSmoothAnimationsInfo, "view_animations", true, value -> SharedConfig.setAnimationsEnabled(value));
                     break;
+                case CATEGORY_APPEARANCE:
+                    addHeader(context, content, R.string.OmniGramAppearanceSection);
+                    addToggle(context, content, R.string.OmniGramMaterial3, R.string.OmniGramMaterial3Info, "omnigram_material3", true, value -> {
+                        finishFragment();
+                        presentFragment(new OmniGramSettingsActivity());
+                    });
+                    addChoice(context, content, R.string.OmniGramCornerRadius, "omnigram_corner_radius", new String[] {"Малые", "Средние", "Большие"}, new int[] {11, 17, 24}, 17);
+                    break;
+                case CATEGORY_CHATS:
+                    addHeader(context, content, R.string.OmniGramChatsSection);
+                    addToggle(context, content, R.string.OmniGramFloatingTabs, R.string.OmniGramFloatingTabsInfo, "omnigram_floating_tabs", false, null);
+                    addChoice(context, content, R.string.OmniGramInputStyle, "omnigram_input_style", new String[] {"Стандартная", "Компактная", "Плавающая"}, new String[] {"standard", "compact", "floating"}, "standard");
+                    addToggle(context, content, R.string.OmniGramReorderMessageActions, R.string.OmniGramReorderMessageActionsInfo, "omnigram_reorder_message_actions", false, null);
+                    addToggle(context, content, R.string.OmniGramHideMessageActions, R.string.OmniGramHideMessageActionsInfo, "omnigram_hide_message_actions", false, null);
+                    break;
+                case CATEGORY_MEDIA:
+                    addHeader(context, content, R.string.OmniGramMediaSection);
+                    addToggle(context, content, R.string.OmniGramAutoplayVideo, R.string.OmniGramAutoplayVideoInfo, "autoplay_video", true, null);
+                    addToggle(context, content, R.string.OmniGramAutoplayGif, R.string.OmniGramAutoplayGifInfo, "autoplay_gif", true, null);
+                    break;
                 case CATEGORY_PRIVACY:
                     addHeader(context, content, R.string.OmniGramPrivacySection);
                     addToggle(context, content, R.string.OmniGramHidePhoneLocal, R.string.OmniGramHidePhoneLocalInfo, "omnigram_hide_phone_local", false, null);
@@ -224,7 +252,15 @@ public class OmniGramSettingsActivity extends BaseFragment {
                                 .remove("omnigram_clean_tracking_params")
                                 .remove("omnigram_disable_proxy_on_vpn")
                                 .remove("omnigram_disable_ads")
+                                .remove("omnigram_material3")
+                                .remove("omnigram_corner_radius")
+                                .remove("omnigram_floating_tabs")
+                                .remove("omnigram_input_style")
+                                .remove("omnigram_reorder_message_actions")
+                                .remove("omnigram_hide_message_actions")
                                 .apply();
+                        SharedConfig.bubbleRadius = 17;
+                        SharedConfig.saveConfig();
                         SharedConfig.setAnimationsEnabled(true);
                         showSettingsToast(R.string.OmniGramSettingsReset);
                     }).show();
@@ -243,6 +279,12 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 values.put("omnigram_clean_tracking_params", preferences.getBoolean("omnigram_clean_tracking_params", true));
                 values.put("omnigram_disable_proxy_on_vpn", preferences.getBoolean("omnigram_disable_proxy_on_vpn", false));
                 values.put("omnigram_disable_ads", preferences.getBoolean("omnigram_disable_ads", false));
+                values.put("omnigram_material3", preferences.getBoolean("omnigram_material3", true));
+                values.put("omnigram_corner_radius", preferences.getInt("omnigram_corner_radius", 17));
+                values.put("omnigram_floating_tabs", preferences.getBoolean("omnigram_floating_tabs", false));
+                values.put("omnigram_input_style", preferences.getString("omnigram_input_style", "standard"));
+                values.put("omnigram_reorder_message_actions", preferences.getBoolean("omnigram_reorder_message_actions", false));
+                values.put("omnigram_hide_message_actions", preferences.getBoolean("omnigram_hide_message_actions", false));
                 json.put("values", values);
                 exportPayload = json.toString(2);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -317,6 +359,17 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 if (pendingImportedValues.has("omnigram_clean_tracking_params")) editor.putBoolean("omnigram_clean_tracking_params", pendingImportedValues.getBoolean("omnigram_clean_tracking_params"));
                 if (pendingImportedValues.has("omnigram_disable_proxy_on_vpn")) editor.putBoolean("omnigram_disable_proxy_on_vpn", pendingImportedValues.getBoolean("omnigram_disable_proxy_on_vpn"));
                 if (pendingImportedValues.has("omnigram_disable_ads")) editor.putBoolean("omnigram_disable_ads", pendingImportedValues.getBoolean("omnigram_disable_ads"));
+                if (pendingImportedValues.has("omnigram_material3")) editor.putBoolean("omnigram_material3", pendingImportedValues.getBoolean("omnigram_material3"));
+                if (pendingImportedValues.has("omnigram_floating_tabs")) editor.putBoolean("omnigram_floating_tabs", pendingImportedValues.getBoolean("omnigram_floating_tabs"));
+                if (pendingImportedValues.has("omnigram_input_style")) editor.putString("omnigram_input_style", pendingImportedValues.getString("omnigram_input_style"));
+                if (pendingImportedValues.has("omnigram_reorder_message_actions")) editor.putBoolean("omnigram_reorder_message_actions", pendingImportedValues.getBoolean("omnigram_reorder_message_actions"));
+                if (pendingImportedValues.has("omnigram_hide_message_actions")) editor.putBoolean("omnigram_hide_message_actions", pendingImportedValues.getBoolean("omnigram_hide_message_actions"));
+                if (pendingImportedValues.has("omnigram_corner_radius")) {
+                    int radius = pendingImportedValues.getInt("omnigram_corner_radius");
+                    editor.putInt("omnigram_corner_radius", radius);
+                    SharedConfig.bubbleRadius = radius;
+                    SharedConfig.saveConfig();
+                }
                 editor.apply();
                 pendingImportedValues = null;
                 showSettingsToast(R.string.OmniGramSettingsImported);
@@ -340,6 +393,7 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 cell.setChecked(enabled);
                 preferences.edit().putBoolean(key, enabled).apply();
                 if (changed != null) changed.onChanged(enabled);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_ALL);
             });
             content.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(50)));
             if (info != 0) {
@@ -347,6 +401,52 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 infoCell.setText(LocaleController.getString(info));
                 content.addView(infoCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
             }
+        }
+
+        private void addChoice(Context context, LinearLayout content, int title, String key, String[] labels, int[] values, int defaultValue) {
+            TextCell cell = new TextCell(context, 23, false, true, null);
+            cell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+            int selected = preferences.getInt(key, defaultValue);
+            cell.setTextAndValue(LocaleController.getString(title), getChoiceLabel(selected, values, labels), true);
+            cell.setOnClickListener(v -> new AlertDialog.Builder(getParentActivity())
+                    .setTitle(LocaleController.getString(title))
+                    .setItems(labels, (dialog, which) -> {
+                        int radius = values[which];
+                        preferences.edit().putInt(key, radius).apply();
+                        SharedConfig.bubbleRadius = radius;
+                        SharedConfig.saveConfig();
+                        cell.setTextAndValue(LocaleController.getString(title), labels[which], true);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_ALL);
+                    }).show());
+            content.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(50)));
+        }
+
+        private String getChoiceLabel(int selected, int[] values, String[] labels) {
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] == selected) return labels[i];
+            }
+            return labels[1];
+        }
+
+        private void addChoice(Context context, LinearLayout content, int title, String key, String[] labels, String[] values, String defaultValue) {
+            TextCell cell = new TextCell(context, 23, false, true, null);
+            cell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+            String selected = preferences.getString(key, defaultValue);
+            cell.setTextAndValue(LocaleController.getString(title), getChoiceLabel(selected, values, labels), true);
+            cell.setOnClickListener(v -> new AlertDialog.Builder(getParentActivity())
+                    .setTitle(LocaleController.getString(title))
+                    .setItems(labels, (dialog, which) -> {
+                        preferences.edit().putString(key, values[which]).apply();
+                        cell.setTextAndValue(LocaleController.getString(title), labels[which], true);
+                    }).show());
+            content.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(50)));
+        }
+
+        private String getChoiceLabel(String selected, String[] values, String[] labels) {
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(selected)) return labels[i];
+            }
+            return labels[0];
         }
 
         private void addAction(Context context, LinearLayout content, int title, Integer info, View.OnClickListener listener) {

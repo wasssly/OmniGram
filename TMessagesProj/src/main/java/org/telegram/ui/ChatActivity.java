@@ -46293,6 +46293,36 @@ public class ChatActivity extends BaseFragment implements
             options.add(OPTION_WELCOME_REVERT);
             icons.add(R.drawable.outline_revert_24);
         }
+
+        if (MessagesController.getGlobalMainSettings().getBoolean("omnigram_hide_message_actions", false)) {
+            for (int i = options.size() - 1; i >= 0; i--) {
+                int option = options.get(i);
+                if (option == OPTION_TRANSLATE || option == OPTION_REPORT_CHAT || option == OPTION_REPORT_AD || option == OPTION_ABOUT_REVENUE_SHARING_ADS || option == OPTION_STATISTICS) {
+                    options.remove(i);
+                    items.remove(i);
+                    icons.remove(i);
+                }
+            }
+        }
+        if (MessagesController.getGlobalMainSettings().getBoolean("omnigram_reorder_message_actions", false)) {
+            ArrayList<Integer> orderedOptions = new ArrayList<>();
+            orderedOptions.add(OPTION_REPLY);
+            orderedOptions.add(OPTION_COPY);
+            orderedOptions.add(OPTION_FORWARD);
+            for (int wanted : orderedOptions) {
+                for (int i = 0; i < options.size(); i++) {
+                    if (options.get(i) == wanted) {
+                        CharSequence item = items.remove(i);
+                        Integer icon = icons.remove(i);
+                        options.remove(i);
+                        items.add(0, item);
+                        icons.add(0, icon);
+                        options.add(0, wanted);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private boolean showWelcomeMessageRevertOption(MessageObject messageObject) {
