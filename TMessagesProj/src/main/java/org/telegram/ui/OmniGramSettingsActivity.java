@@ -47,10 +47,6 @@ public class OmniGramSettingsActivity extends BaseFragment {
     public static final int CATEGORY_DATA = 6;
     public static final int CATEGORY_PROJECT = 7;
 
-    public static boolean experimentalFeaturesEnabled() {
-        return MessagesController.getGlobalMainSettings().getBoolean("omnigram_experimental_features", false);
-    }
-
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
@@ -186,7 +182,6 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 case CATEGORY_GENERAL:
                     addHeader(context, content, R.string.OmniGramGeneralSection);
                     addToggle(context, content, R.string.OmniGramSmoothAnimations, R.string.OmniGramSmoothAnimationsInfo, "view_animations", true, value -> SharedConfig.setAnimationsEnabled(value));
-                    addToggle(context, content, R.string.OmniGramExperimentalFeatures, R.string.OmniGramExperimentalFeaturesInfo, "omnigram_experimental_features", false, null);
                     break;
                 case CATEGORY_PRIVACY:
                     addHeader(context, content, R.string.OmniGramPrivacySection);
@@ -222,7 +217,6 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     .setPositiveButton(LocaleController.getString(R.string.Reset), (dialog, which) -> {
                         preferences.edit()
                                 .remove("view_animations")
-                                .remove("omnigram_experimental_features")
                                 .remove("autoplay_video")
                                 .remove("autoplay_gif")
                                 .remove("omnigram_hide_phone_local")
@@ -242,7 +236,6 @@ public class OmniGramSettingsActivity extends BaseFragment {
                 json.put("schemaVersion", 1);
                 JSONObject values = new JSONObject();
                 values.put("view_animations", preferences.getBoolean("view_animations", true));
-                values.put("omnigram_experimental_features", preferences.getBoolean("omnigram_experimental_features", false));
                 values.put("autoplay_video", preferences.getBoolean("autoplay_video", true));
                 values.put("autoplay_gif", preferences.getBoolean("autoplay_gif", true));
                 values.put("omnigram_hide_phone_local", preferences.getBoolean("omnigram_hide_phone_local", false));
@@ -317,7 +310,6 @@ public class OmniGramSettingsActivity extends BaseFragment {
                     editor.putBoolean("view_animations", enabled);
                     SharedConfig.setAnimationsEnabled(enabled);
                 }
-                if (pendingImportedValues.has("omnigram_experimental_features")) editor.putBoolean("omnigram_experimental_features", pendingImportedValues.getBoolean("omnigram_experimental_features"));
                 if (pendingImportedValues.has("autoplay_video")) editor.putBoolean("autoplay_video", pendingImportedValues.getBoolean("autoplay_video"));
                 if (pendingImportedValues.has("autoplay_gif")) editor.putBoolean("autoplay_gif", pendingImportedValues.getBoolean("autoplay_gif"));
                 if (pendingImportedValues.has("omnigram_hide_phone_local")) editor.putBoolean("omnigram_hide_phone_local", pendingImportedValues.getBoolean("omnigram_hide_phone_local"));
